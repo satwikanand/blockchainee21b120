@@ -1,0 +1,44 @@
+//I am using an older version of solidity as I learnt from youtube videoes using this only
+pragma solidity ^0.5.0;
+
+contract _Crowdfunding {
+    address owner;
+    //setting the goal to some random value
+    //I can also use a function to take input from msg.sender as owner to set goal
+    uint256 goal=4;
+    
+    
+    mapping(address => uint256) public pledgeOf;
+     uint256 numberOfDays=2;
+     //now function gives current time stamp
+     uint256 deadline = now + (numberOfDays * 1 days);
+    
+    
+    //payable function pays the money out of smart contract
+    function pledge(uint256 amount) public payable returns(uint) {
+    require(now < deadline);                
+    require(msg.value == amount);
+    //This will be useful in initiating withdrawl  
+    pledgeOf[msg.sender] += amount;
+    
+
+    
+    }
+//Only owner can initiate withdrawals
+function claimFunds() public {
+     
+    require(now >= deadline);               
+    require(msg.sender == owner);
+
+    msg.sender.transfer(address(this).balance);
+}
+function getRefund() public {
+    require(address(this).balance < goal);  
+    require(now >= deadline);               
+
+    uint256 amount = pledgeOf[msg.sender];
+    pledgeOf[msg.sender] = 0;
+    msg.sender.transfer(amount);
+}
+    
+}
